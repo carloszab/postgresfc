@@ -1051,6 +1051,33 @@ _copyPlanInvalItem(const PlanInvalItem *from)
 	return newnode;
 }
 
+/*
+ * _copyFuzzyClustering
+ */
+
+static FuzzyClustering *
+_copyFuzzyClustering(const FuzzyClustering *from)
+{
+	FuzzyClustering *newnode = makeNode(FuzzyClustering);
+
+	/*
+	 * copy node superclass fields
+	 */
+
+	CopyPlanFields((const Plan *) from, (Plan *) newnode);
+
+	/*
+	 * copy remainder of node
+	 */
+
+	COPY_SCALAR_FIELD(cant_grupos);
+	COPY_SCALAR_FIELD(fuzziness);
+	COPY_SCALAR_FIELD(error);
+
+	return newnode;
+
+}
+
 /* ****************************************************************
  *					   primnodes.h copy functions
  * ****************************************************************
@@ -2689,6 +2716,7 @@ _copyQuery(const Query *from)
 	COPY_NODE_FIELD(rtable);
 	COPY_NODE_FIELD(jointree);
 	COPY_NODE_FIELD(targetList);
+	COPY_NODE_FIELD(fuzzyclusteringClause);
 	COPY_NODE_FIELD(onConflict);
 	COPY_NODE_FIELD(returningList);
 	COPY_NODE_FIELD(groupClause);
@@ -4301,6 +4329,9 @@ copyObject(const void *from)
 			break;
 		case T_PlanInvalItem:
 			retval = _copyPlanInvalItem(from);
+			break;
+		case T_FuzzyClustering:
+			retval = _copyFuzzyClustering(from);
 			break;
 
 			/*

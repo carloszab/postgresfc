@@ -370,6 +370,7 @@ static Node *makeRecursiveViewSelect(char *relname, List *aliases, Node *query);
 				create_generic_options alter_generic_options
 				relation_expr_list dostmt_opt_list
 				transform_element_list transform_type_list
+				fuzzyclustering_clause fuzzyclustering_list
 
 %type <list>	group_by_list
 %type <node>	group_by_item empty_grouping_set rollup_clause cube_clause
@@ -586,6 +587,7 @@ static Node *makeRecursiveViewSelect(char *relname, List *aliases, Node *query);
 
 	FALSE_P FAMILY FETCH FILTER FIRST_P FLOAT_P FOLLOWING FOR
 	FORCE FOREIGN FORWARD FREEZE FROM FULL FUNCTION FUNCTIONS
+	FUZZYCLUSTERING
 
 	GLOBAL GRANT GRANTED GREATEST GROUP_P GROUPING
 
@@ -10019,6 +10021,7 @@ select_clause:
 simple_select:
 			SELECT opt_all_clause opt_target_list
 			into_clause from_clause where_clause
+			fuzzyclustering_clause
 			group_clause having_clause window_clause
 				{
 					SelectStmt *n = makeNode(SelectStmt);
@@ -10026,13 +10029,15 @@ simple_select:
 					n->intoClause = $4;
 					n->fromClause = $5;
 					n->whereClause = $6;
-					n->groupClause = $7;
-					n->havingClause = $8;
-					n->windowClause = $9;
+					n->fuzzyclusteringClause = $7;
+					n->groupClause = $8;
+					n->havingClause = $9;
+					n->windowClause = $10;
 					$$ = (Node *)n;
 				}
 			| SELECT distinct_clause target_list
 			into_clause from_clause where_clause
+			fuzzyclustering_clause
 			group_clause having_clause window_clause
 				{
 					SelectStmt *n = makeNode(SelectStmt);
@@ -10041,9 +10046,10 @@ simple_select:
 					n->intoClause = $4;
 					n->fromClause = $5;
 					n->whereClause = $6;
-					n->groupClause = $7;
-					n->havingClause = $8;
-					n->windowClause = $9;
+					n->fuzzyclusteringClause = $7;
+					n->groupClause = $8;
+					n->havingClause = $9;
+					n->windowClause = $10;
 					$$ = (Node *)n;
 				}
 			| values_clause							{ $$ = $1; }
@@ -10361,6 +10367,15 @@ row_or_rows: ROW									{ $$ = 0; }
 
 first_or_next: FIRST_P								{ $$ = 0; }
 			| NEXT									{ $$ = 0; }
+		;
+
+fuzzyclustering_clause:	
+			FUZZYCLUSTERING fuzzyclustering_list	{ $$ = $2; }
+			| /*EMPTY*/								{ $$ = NIL; }
+		;
+		
+fuzzyclustering_list:	FCONST 						{ $$ = list_make1($1); }
+			| fuzzyclustering_list ',' FCONST		{ $$ = lappend($1, $3); }
 		;
 
 
@@ -14049,6 +14064,7 @@ reserved_keyword:
 			| FOR
 			| FOREIGN
 			| FROM
+			| FUZZYCLUSTERING
 			| GRANT
 			| GROUP_P
 			| HAVING

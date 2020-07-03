@@ -2052,4 +2052,19 @@ typedef struct LimitState
 	TupleTableSlot *subSlot;	/* tuple last obtained from subplan */
 } LimitState;
 
+typedef struct FuzzyClusteringState
+{
+	ScanState	ss;
+	int 		tupla_actual; 		/* un simple contador */
+	int			total_tuplas;
+	bool		calcular;			/*true si hay que hacer las operaciones o false si ya se realizaron*/
+	float 		*centros;
+	float       *pertenencia;
+	float 		cant_grupos;
+	float 		fuzziness;
+	float 		error;
+	TupleTableSlot *tupla;
+	void 		*tuplestorestate;
+} FuzzyClusteringState;
+
 #endif   /* EXECNODES_H */

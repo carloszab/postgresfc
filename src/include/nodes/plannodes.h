@@ -951,4 +951,17 @@ typedef struct PlanInvalItem
 	uint32		hashValue;		/* hash value of object's cache lookup key */
 } PlanInvalItem;
 
+/*
+ * ==========
+ * Fuzzy clustering nodes
+ * ==========
+ */
+typedef struct FuzzyClustering
+{
+	Plan		plan;
+	float		cant_grupos;
+	float		fuzziness;
+	float		error;
+} FuzzyClustering;
+
 #endif   /* PLANNODES_H */

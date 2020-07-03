@@ -134,6 +134,8 @@ typedef struct Query
 
 	List	   *returningList;	/* return-values list (of TargetEntry) */
 
+	List	   *fuzzyclusteringClause; /* una lista para fuzzyclusteringClause */
+
 	List	   *groupClause;	/* a list of SortGroupClause's */
 
 	List	   *groupingSets;	/* a list of GroupingSet's if present */
@@ -1283,6 +1285,7 @@ typedef struct SelectStmt
 	List	   *targetList;		/* the target list (of ResTarget) */
 	List	   *fromClause;		/* the FROM clause */
 	Node	   *whereClause;	/* WHERE qualification */
+	List	   *fuzzyclusteringClause; /* lista de FUZZYCLUSTERING */
 	List	   *groupClause;	/* GROUP BY clauses */
 	Node	   *havingClause;	/* HAVING conditional-expression */
 	List	   *windowClause;	/* WINDOW window_name AS (...), ... */

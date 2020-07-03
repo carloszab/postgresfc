@@ -90,6 +90,7 @@ extern ModifyTable *make_modifytable(PlannerInfo *root,
 				 List *withCheckOptionLists, List *returningLists,
 				 List *rowMarks, OnConflictExpr *onconflict, int epqParam);
 extern bool is_projection_capable_plan(Plan *plan);
+extern FuzzyClustering *make_fuzzyclustering(List *tlist,List *fclist, Plan *lefttree);
 
 /*
  * prototypes for plan/initsplan.c

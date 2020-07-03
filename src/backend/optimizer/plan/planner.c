@@ -2203,6 +2203,19 @@ grouping_planner(PlannerInfo *root, double tuple_fraction)
 	}							/* end of if (setOperations) */
 
 	/*
+	 * If we have a FuzzyClusteringClause, insert a FUZZYCLUSTERING node 
+	 */
+	if (parse->fuzzyclusteringClause)	{
+		List *fclist;
+		if (parse->hasAggs)
+			fclist = result_plan->targetlist;
+		else
+			fclist = tlist;
+			
+		result_plan = (Plan *) make_fuzzyclustering(fclist,parse->fuzzyclusteringClause,result_plan);	
+	}
+
+	/*
 	 * If there is a DISTINCT clause, add the necessary node(s).
 	 */
 	if (parse->distinctClause)

@@ -3291,3 +3291,22 @@ transformFrameOffset(ParseState *pstate, int frameOptions, Node *clause)
 
 	return node;
 }
+
+List *
+transformFuzzyClusteringClause(ParseState *pstate, List *fuzzyclusteringlist)
+{
+	List	   *fclist = NIL;
+
+	if (fuzzyclusteringlist == NIL)
+		elog(ERROR, "error with FuzzyClusteringClause, the list is empty");
+
+	if (list_length(fuzzyclusteringlist)!=3)
+		elog(ERROR, "wrong number of parameters in FUZZYCLUSTERING (c,m,e)");
+	else 
+		{
+			fclist = lappend(fclist,list_nth(fuzzyclusteringlist, 0));
+			fclist = lappend(fclist,list_nth(fuzzyclusteringlist, 1));
+			fclist = lappend(fclist,list_nth(fuzzyclusteringlist, 2));
+		}
+		return fclist;
+}

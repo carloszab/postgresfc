@@ -78,6 +78,7 @@ typedef enum NodeTag
 	T_SetOp,
 	T_LockRows,
 	T_Limit,
+	T_FuzzyClustering,
 	/* these aren't subclasses of Plan: */
 	T_NestLoopParam,
 	T_PlanRowMark,
@@ -125,6 +126,7 @@ typedef enum NodeTag
 	T_SetOpState,
 	T_LockRowsState,
 	T_LimitState,
+	T_FuzzyClusteringState,
 
 	/*
 	 * TAGS FOR PRIMITIVE NODES (primnodes.h)

@@ -5148,3 +5148,32 @@ is_projection_capable_plan(Plan *plan)
 	}
 	return true;
 }
+
+FuzzyClustering *
+make_fuzzyclustering(List *qptlist,List *fclist,Plan *lefttree)
+{
+	FuzzyClustering    *node = makeNode(FuzzyClustering);
+	Plan	   *plan = &node->plan;
+	int			numCols = list_length(qptlist);
+
+	copy_plan_costsize(plan, lefttree);
+	
+	plan->total_cost += cpu_operator_cost * plan->plan_rows * numCols;
+	//plan->total_cost = sort_path.total_cost + lefttree->total_cost;
+
+	plan->plan_rows *= 0.1;
+	if (plan->plan_rows < 1)
+		plan->plan_rows = 1;
+	
+	//plan->state = (EState *) NULL;
+	plan->targetlist = qptlist;
+	plan->qual = NIL;
+	plan->lefttree = lefttree;
+	plan->righttree = NULL;
+	node->cant_grupos = strtof(list_nth(fclist, 0), NULL);
+	node->fuzziness = strtof(list_nth(fclist, 1), NULL);
+	node->error = strtof(list_nth(fclist, 2), NULL);
+	
+	return node;
+
+}

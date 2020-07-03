@@ -52,5 +52,6 @@ extern List *addTargetToSortList(ParseState *pstate, TargetEntry *tle,
 					bool resolveUnknown);
 extern Index assignSortGroupRef(TargetEntry *tle, List *tlist);
 extern bool targetIsInSortList(TargetEntry *tle, Oid sortop, List *sortList);
+extern List *transformFuzzyClusteringClause(ParseState *pstate, List *fuzzyclusteringlist);
 
 #endif   /* PARSE_CLAUSE_H */
