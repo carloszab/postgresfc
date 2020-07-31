@@ -959,9 +959,9 @@ typedef struct PlanInvalItem
 typedef struct FuzzyClustering
 {
 	Plan		plan;
-	float		cant_grupos;
-	float		fuzziness;
-	float		error;
+	int		cant_grupos;
+	int		fuzziness;
+	int		error;
 } FuzzyClustering;
 
 #endif   /* PLANNODES_H */

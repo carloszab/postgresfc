@@ -10374,8 +10374,8 @@ fuzzyclustering_clause:
 			| /*EMPTY*/								{ $$ = NIL; }
 		;
 		
-fuzzyclustering_list:	FCONST 						{ $$ = list_make1($1); }
-			| fuzzyclustering_list ',' FCONST		{ $$ = lappend($1, $3); }
+fuzzyclustering_list:	Iconst 						{ $$ = list_make1_int($1); }
+			| fuzzyclustering_list ',' Iconst		{ $$ = lappend_int($1, $3); }
 		;
 
 

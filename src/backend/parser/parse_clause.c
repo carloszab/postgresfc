@@ -3304,9 +3304,9 @@ transformFuzzyClusteringClause(ParseState *pstate, List *fuzzyclusteringlist)
 		elog(ERROR, "wrong number of parameters in FUZZYCLUSTERING (c,m,e)");
 	else 
 		{
-			fclist = lappend(fclist,list_nth(fuzzyclusteringlist, 0));
-			fclist = lappend(fclist,list_nth(fuzzyclusteringlist, 1));
-			fclist = lappend(fclist,list_nth(fuzzyclusteringlist, 2));
+			fclist = lappend_int(fclist,list_nth_int(fuzzyclusteringlist, 0));
+			fclist = lappend_int(fclist,list_nth_int(fuzzyclusteringlist, 1));
+			fclist = lappend_int(fclist,list_nth_int(fuzzyclusteringlist, 2));
 		}
 		return fclist;
 }

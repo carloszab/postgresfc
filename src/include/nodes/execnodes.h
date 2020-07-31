@@ -2060,11 +2060,11 @@ typedef struct FuzzyClusteringState
 	bool		calcular;			/*true si hay que hacer las operaciones o false si ya se realizaron*/
 	float 		*centros;
 	float       *pertenencia;
-	float 		cant_grupos;
+	int 		cant_grupos;
 	float 		fuzziness;
 	float 		error;
 	TupleTableSlot *tupla;
-	void 		*tuplestorestate;
+	Tuplestorestate 		*tss;
 } FuzzyClusteringState;
 
 #endif   /* EXECNODES_H */

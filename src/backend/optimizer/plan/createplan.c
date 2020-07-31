@@ -5170,9 +5170,9 @@ make_fuzzyclustering(List *qptlist,List *fclist,Plan *lefttree)
 	plan->qual = NIL;
 	plan->lefttree = lefttree;
 	plan->righttree = NULL;
-	node->cant_grupos = strtof(list_nth(fclist, 0), NULL);
-	node->fuzziness = strtof(list_nth(fclist, 1), NULL);
-	node->error = strtof(list_nth(fclist, 2), NULL);
+	node->cant_grupos = list_nth_int(fclist, 0);
+	node->fuzziness = list_nth_int(fclist, 1);
+	node->error = list_nth_int(fclist, 2);
 	
 	return node;
 
