@@ -1052,13 +1052,13 @@ _copyPlanInvalItem(const PlanInvalItem *from)
 }
 
 /*
- * _copyFuzzyClustering
+ * _copyClustering
  */
 
-static FuzzyClustering *
-_copyFuzzyClustering(const FuzzyClustering *from)
+static Clustering *
+_copyClustering(const Clustering *from)
 {
-	FuzzyClustering *newnode = makeNode(FuzzyClustering);
+	Clustering *newnode = makeNode(Clustering);
 
 	/*
 	 * copy node superclass fields
@@ -2716,7 +2716,7 @@ _copyQuery(const Query *from)
 	COPY_NODE_FIELD(rtable);
 	COPY_NODE_FIELD(jointree);
 	COPY_NODE_FIELD(targetList);
-	COPY_NODE_FIELD(fuzzyclusteringClause);
+	COPY_NODE_FIELD(clusteringClause);
 	COPY_NODE_FIELD(onConflict);
 	COPY_NODE_FIELD(returningList);
 	COPY_NODE_FIELD(groupClause);
@@ -4330,8 +4330,8 @@ copyObject(const void *from)
 		case T_PlanInvalItem:
 			retval = _copyPlanInvalItem(from);
 			break;
-		case T_FuzzyClustering:
-			retval = _copyFuzzyClustering(from);
+		case T_Clustering:
+			retval = _copyClustering(from);
 			break;
 
 			/*

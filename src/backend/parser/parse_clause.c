@@ -3293,20 +3293,20 @@ transformFrameOffset(ParseState *pstate, int frameOptions, Node *clause)
 }
 
 List *
-transformFuzzyClusteringClause(ParseState *pstate, List *fuzzyclusteringlist)
+transformClusteringClause(ParseState *pstate, List *clusteringlist)
 {
 	List	   *fclist = NIL;
 
-	if (fuzzyclusteringlist == NIL)
-		elog(ERROR, "error with FuzzyClusteringClause, the list is empty");
+	if (clusteringlist == NIL)
+		elog(ERROR, "error with ClusteringClause, the list is empty");
 
-	if (list_length(fuzzyclusteringlist)!=3)
-		elog(ERROR, "wrong number of parameters in FUZZYCLUSTERING (c,m,e)");
+	if (list_length(clusteringlist)!=3)
+		elog(ERROR, "wrong number of parameters in CLUSTERING (c,m,e)");
 	else 
 		{
-			fclist = lappend_int(fclist,list_nth_int(fuzzyclusteringlist, 0));
-			fclist = lappend_int(fclist,list_nth_int(fuzzyclusteringlist, 1));
-			fclist = lappend_int(fclist,list_nth_int(fuzzyclusteringlist, 2));
+			fclist = lappend_int(fclist,list_nth_int(clusteringlist, 0));
+			fclist = lappend_int(fclist,list_nth_int(clusteringlist, 1));
+			fclist = lappend_int(fclist,list_nth_int(clusteringlist, 2));
 		}
 		return fclist;
 }

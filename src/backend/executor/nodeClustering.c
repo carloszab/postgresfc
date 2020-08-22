@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
  *
- * nodeFuzzyClustering.c
+ * nodeClustering.c
  *	  Support routines for fuzzy clustering.
  *
  * Portions Copyright (c) 2020, PostgreSQLf UCAB Development Group
@@ -8,23 +8,23 @@
  *
  *
  * IDENTIFICATION
- *	  src/backend/executor/nodeFuzzyClustering.c
+ *	  src/backend/executor/nodeClustering.c
  *
  *-------------------------------------------------------------------------
  */
 /*
  * INTERFACE ROUTINES
- *		ExecInitFuzzyClustering     creates and initializes a fuzzyclustering node.
- *		ExecFuzzyClustering         return generated tuples.
- *		ExecEndFuzzyClustering      releases any storage allocated.
- *		ExecReScanFuzzyClustering   rescans.
+ *		ExecInitClustering     creates and initializes a clustering node.
+ *		ExecClustering         return generated tuples.
+ *		ExecEndClustering      releases any storage allocated.
+ *		ExecReScanClustering   rescans.
  */
 #include "postgres.h"
 
 #include "access/relscan.h"
 #include "executor/executor.h"
 #include "executor/execdebug.h"
-#include "executor/nodeFuzzyClustering.h"
+#include "executor/nodeClustering.h"
 #include "utils/rel.h"
 #include "../include/utils/tuplestore.h"
 //#include "backend/utils/sort/tuplestore.c"
@@ -36,7 +36,7 @@ src/backend/utils/sort/tuplestore.c
 
 #include "miscadmin.h" // necesario para usar work_mem
 
-float calcularPertenencia2(int j, int dimension, float datos[dimension], int cantGrupos, FuzzyClusteringState *node, float centros[cantGrupos][dimension]){
+float calcularPertenencia2(int j, int dimension, float datos[dimension], int cantGrupos, ClusteringState *node, float centros[cantGrupos][dimension]){
 	float sum = 0;
 	float distance = 0;
 	float distanceaux = 0;
@@ -67,7 +67,7 @@ float calcularPertenencia2(int j, int dimension, float datos[dimension], int can
 
 }
 
-float calcularPertenencia(int j, int dimensionGrupo, float datos[dimensionGrupo], int cantGrupos, TupleTableSlot *slot, FuzzyClusteringState *node){
+float calcularPertenencia(int j, int dimensionGrupo, float datos[dimensionGrupo], int cantGrupos, TupleTableSlot *slot, ClusteringState *node){
 	float membership = 0;
 	float sum = 0;
 	float distance = 0;
@@ -103,7 +103,7 @@ float calcularPertenencia(int j, int dimensionGrupo, float datos[dimensionGrupo]
 	return membership;
 }
 
-float calcularCentro2 (int i, int j, int totalTuplas, FuzzyClusteringState *node, int cantGrupos, float pertenencia[totalTuplas][cantGrupos]){
+float calcularCentro2 (int i, int j, int totalTuplas, ClusteringState *node, int cantGrupos, float pertenencia[totalTuplas][cantGrupos]){
 	
 	float sum1 = 0;
 	float sum2 = 0;
@@ -128,7 +128,7 @@ float calcularCentro2 (int i, int j, int totalTuplas, FuzzyClusteringState *node
 	return (sum1/sum2);
 }
 
-float calcularCentro (int i, int j, int totalTuplas, TupleTableSlot *slot, FuzzyClusteringState *node){
+float calcularCentro (int i, int j, int totalTuplas, TupleTableSlot *slot, ClusteringState *node){
 
 	float sum1 = 0;
 	float sum2 = 0;
@@ -172,11 +172,11 @@ float calcularCentro (int i, int j, int totalTuplas, TupleTableSlot *slot, Fuzzy
 }
 
 /* -------------------
- * ExecFuzzyClustering
+ * ExecClustering
  * -------------------
  */
 TupleTableSlot *
-ExecFuzzyClusteringno(FuzzyClusteringState *node)
+ExecClusteringno(ClusteringState *node)
 {
 	
 	TupleTableSlot *slot;
@@ -457,7 +457,7 @@ return ExecStoreTuple(tuple, slot, InvalidBuffer, true);
 }
 
 TupleTableSlot *
-ExecFuzzyClustering(FuzzyClusteringState *node)
+ExecClustering(ClusteringState *node)
 {
 
 	TupleTableSlot *slot;
@@ -666,18 +666,18 @@ ExecFuzzyClustering(FuzzyClusteringState *node)
 
 
 /* -----------------------
- * ExecInitFuzzyClustering
+ * ExecInitClustering
  * -----------------------
  */
-FuzzyClusteringState *
-ExecInitFuzzyClustering(FuzzyClustering *node, EState *estate, int eflags)
+ClusteringState *
+ExecInitClustering(Clustering *node, EState *estate, int eflags)
 {
-	FuzzyClusteringState *fcstate;
+	ClusteringState *fcstate;
 	//elog(ERROR, "aqui");
 	/*
 	 * create state structure
 	 */
-	fcstate = makeNode(FuzzyClusteringState);
+	fcstate = makeNode(ClusteringState);
 	fcstate->ss.ps.plan = (Plan *) node;
 	fcstate->ss.ps.state = estate;
 	fcstate->tupla_actual = 0; 	
@@ -731,11 +731,11 @@ ExecInitFuzzyClustering(FuzzyClustering *node, EState *estate, int eflags)
 }
 
 /* ----------------------
- * ExecEndFuzzyClustering
+ * ExecEndClustering
  * ----------------------
  */
 void
-ExecEndFuzzyClustering(FuzzyClusteringState *node)
+ExecEndClustering(ClusteringState *node)
 {
 	
     ExecFreeExprContext(&node->ss.ps);

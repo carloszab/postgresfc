@@ -88,7 +88,7 @@
 #include "executor/nodeCustom.h"
 #include "executor/nodeForeignscan.h"
 #include "executor/nodeFunctionscan.h"
-#include "executor/nodeFuzzyClustering.h"
+#include "executor/nodeClustering.h"
 #include "executor/nodeGroup.h"
 #include "executor/nodeHash.h"
 #include "executor/nodeHashjoin.h"
@@ -187,8 +187,8 @@ ExecInitNode(Plan *node, EState *estate, int eflags)
 			/*
 			 * scan nodes
 			 */
-		case T_FuzzyClustering:
-			result = (PlanState *) ExecInitFuzzyClustering((FuzzyClustering *) node,
+		case T_Clustering:
+			result = (PlanState *) ExecInitClustering((Clustering *) node,
 												   estate, eflags);
 			break;
 
@@ -414,8 +414,8 @@ ExecProcNode(PlanState *node)
 			/*
 			 * scan nodes
 			 */
-		case T_FuzzyClusteringState:
-			result = ExecFuzzyClustering((FuzzyClusteringState *) node);
+		case T_ClusteringState:
+			result = ExecClustering((ClusteringState *) node);
 			break;
 
 		case T_SeqScanState:
@@ -660,8 +660,8 @@ ExecEndNode(PlanState *node)
 			/*
 			 * scan nodes
 			 */
-		case T_FuzzyClusteringState:
-			ExecEndFuzzyClustering((FuzzyClusteringState *) node);
+		case T_ClusteringState:
+			ExecEndClustering((ClusteringState *) node);
 			break;
 			
 		case T_SeqScanState:

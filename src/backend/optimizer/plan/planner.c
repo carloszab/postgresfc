@@ -1930,16 +1930,16 @@ grouping_planner(PlannerInfo *root, double tuple_fraction)
 			}
 
 			/*
-			* If we have a FuzzyClusteringClause, insert a FUZZYCLUSTERING node 
+			* If we have a ClusteringClause, insert a CLUSTERING node 
 			*/
-			if (parse->fuzzyclusteringClause)	{
+			if (parse->clusteringClause)	{
 				List *fclist;
 				if (parse->hasAggs)
 					fclist = result_plan->targetlist;
 				else
 					fclist = tlist;
 					
-				result_plan = (Plan *) make_fuzzyclustering(fclist,parse->fuzzyclusteringClause,result_plan);	
+				result_plan = (Plan *) make_clustering(fclist,parse->clusteringClause,result_plan);	
 			}
 
 			/*

@@ -5149,10 +5149,10 @@ is_projection_capable_plan(Plan *plan)
 	return true;
 }
 
-FuzzyClustering *
-make_fuzzyclustering(List *qptlist,List *fclist,Plan *lefttree)
+Clustering *
+make_clustering(List *qptlist,List *fclist,Plan *lefttree)
 {
-	FuzzyClustering    *node = makeNode(FuzzyClustering);
+	Clustering    *node = makeNode(Clustering);
 	Plan	   *plan = &node->plan;
 	int			numCols = list_length(qptlist);
 

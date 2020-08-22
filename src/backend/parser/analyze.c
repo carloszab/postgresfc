@@ -1120,9 +1120,9 @@ transformSelectStmt(ParseState *pstate, SelectStmt *stmt)
 	qual = transformWhereClause(pstate, stmt->whereClause,
 								EXPR_KIND_WHERE, "WHERE");
 
-	if (stmt->fuzzyclusteringClause){
-			qry->fuzzyclusteringClause = transformFuzzyClusteringClause(pstate,
-			 	stmt->fuzzyclusteringClause);
+	if (stmt->clusteringClause){
+			qry->clusteringClause = transformClusteringClause(pstate,
+			 	stmt->clusteringClause);
 	}
 
 	/* initial processing of HAVING clause is much like WHERE clause */

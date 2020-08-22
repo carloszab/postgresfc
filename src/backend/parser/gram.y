@@ -370,7 +370,7 @@ static Node *makeRecursiveViewSelect(char *relname, List *aliases, Node *query);
 				create_generic_options alter_generic_options
 				relation_expr_list dostmt_opt_list
 				transform_element_list transform_type_list
-				fuzzyclustering_clause fuzzyclustering_list
+				clustering_clause clustering_list
 
 %type <list>	group_by_list
 %type <node>	group_by_item empty_grouping_set rollup_clause cube_clause
@@ -570,7 +570,7 @@ static Node *makeRecursiveViewSelect(char *relname, List *aliases, Node *query);
 
 	CACHE CALLED CASCADE CASCADED CASE CAST CATALOG_P CHAIN CHAR_P
 	CHARACTER CHARACTERISTICS CHECK CHECKPOINT CLASS CLOSE
-	CLUSTER COALESCE COLLATE COLLATION COLUMN COMMENT COMMENTS COMMIT
+	CLUSTER CLUSTERING COALESCE COLLATE COLLATION COLUMN COMMENT COMMENTS COMMIT
 	COMMITTED CONCURRENTLY CONFIGURATION CONFLICT CONNECTION CONSTRAINT
 	CONSTRAINTS CONTENT_P CONTINUE_P CONVERSION_P COPY COST CREATE
 	CROSS CSV CUBE CURRENT_P
@@ -587,7 +587,6 @@ static Node *makeRecursiveViewSelect(char *relname, List *aliases, Node *query);
 
 	FALSE_P FAMILY FETCH FILTER FIRST_P FLOAT_P FOLLOWING FOR
 	FORCE FOREIGN FORWARD FREEZE FROM FULL FUNCTION FUNCTIONS
-	FUZZYCLUSTERING
 
 	GLOBAL GRANT GRANTED GREATEST GROUP_P GROUPING
 
@@ -10021,7 +10020,7 @@ select_clause:
 simple_select:
 			SELECT opt_all_clause opt_target_list
 			into_clause from_clause where_clause
-			fuzzyclustering_clause
+			clustering_clause
 			group_clause having_clause window_clause
 				{
 					SelectStmt *n = makeNode(SelectStmt);
@@ -10029,7 +10028,7 @@ simple_select:
 					n->intoClause = $4;
 					n->fromClause = $5;
 					n->whereClause = $6;
-					n->fuzzyclusteringClause = $7;
+					n->clusteringClause = $7;
 					n->groupClause = $8;
 					n->havingClause = $9;
 					n->windowClause = $10;
@@ -10037,7 +10036,7 @@ simple_select:
 				}
 			| SELECT distinct_clause target_list
 			into_clause from_clause where_clause
-			fuzzyclustering_clause
+			clustering_clause
 			group_clause having_clause window_clause
 				{
 					SelectStmt *n = makeNode(SelectStmt);
@@ -10046,7 +10045,7 @@ simple_select:
 					n->intoClause = $4;
 					n->fromClause = $5;
 					n->whereClause = $6;
-					n->fuzzyclusteringClause = $7;
+					n->clusteringClause = $7;
 					n->groupClause = $8;
 					n->havingClause = $9;
 					n->windowClause = $10;
@@ -10369,13 +10368,13 @@ first_or_next: FIRST_P								{ $$ = 0; }
 			| NEXT									{ $$ = 0; }
 		;
 
-fuzzyclustering_clause:	
-			FUZZYCLUSTERING fuzzyclustering_list	{ $$ = $2; }
+clustering_clause:	
+			CLUSTERING clustering_list				{ $$ = $2; }
 			| /*EMPTY*/								{ $$ = NIL; }
 		;
 		
-fuzzyclustering_list:	Iconst 						{ $$ = list_make1_int($1); }
-			| fuzzyclustering_list ',' Iconst		{ $$ = lappend_int($1, $3); }
+clustering_list:	Iconst 							{ $$ = list_make1_int($1); }
+			| clustering_list ',' Iconst			{ $$ = lappend_int($1, $3); }
 		;
 
 
@@ -14041,6 +14040,7 @@ reserved_keyword:
 			| CASE
 			| CAST
 			| CHECK
+			| CLUSTERING
 			| COLLATE
 			| COLUMN
 			| CONSTRAINT
@@ -14064,7 +14064,6 @@ reserved_keyword:
 			| FOR
 			| FOREIGN
 			| FROM
-			| FUZZYCLUSTERING
 			| GRANT
 			| GROUP_P
 			| HAVING

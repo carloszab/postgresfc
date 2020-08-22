@@ -441,7 +441,7 @@ set_plan_refs(PlannerInfo *root, Plan *plan, int rtoffset)
 	 */
 	switch (nodeTag(plan))
 	{
-		case T_FuzzyClustering:
+		case T_Clustering:
 			break;
 		case T_SeqScan:
 			{

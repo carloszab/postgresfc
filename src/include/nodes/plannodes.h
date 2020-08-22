@@ -956,12 +956,12 @@ typedef struct PlanInvalItem
  * Fuzzy clustering nodes
  * ==========
  */
-typedef struct FuzzyClustering
+typedef struct Clustering
 {
 	Plan		plan;
 	int		cant_grupos;
 	int		fuzziness;
 	int		error;
-} FuzzyClustering;
+} Clustering;
 
 #endif   /* PLANNODES_H */
