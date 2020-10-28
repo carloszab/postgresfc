@@ -41,22 +41,55 @@ float calcularPertenencia2(int j, int dimension, float datos[dimension], int can
 	float distance = 0;
 	float distanceaux = 0;
 
+	/*
+	Para calcular la pertenencia del dato j al centro i (las letras pueden diferir)
+
+	primero se calcula la distancia del dato j al centro i.
+	nota: si los datos (y en consecuencia los centros) tienen más de un atributo (dimensión), 
+	el proceso se repite por cada uno de estos y al final se suman todas las distancias, 
+	para luego aplicar la raíz cuadrada y obtener la distancia real.
+	*/
+
 	for (int i = 0; i < dimension; i++){
 		distance += pow ( datos[i] - centros[j][i], 2);
 	}
 
 	distance = sqrt(distance);
 
+	/*
+	luego: 
+	*/
+
 	for (int k = 0; k < cantGrupos; k++){
 		distanceaux = 0;
 		
+		/*
+		se calcula la distancia (distanceaux) del dato j al cada uno de los centros
+		*/
+
 		for (int i = 0; i < dimension; i++){
 			distanceaux += pow ( datos[i] - centros[k][i], 2);
 		}
 		distanceaux = sqrt(distanceaux);
 		
+		/*
+		cada vez que se calcula la distancia del dato a un centro se realiza la división
+		distance/distanceaux y luego se eleva a 2/(m-1)
+
+		este proceso se realiza con cada uno de los centros y el resultado se va acumulando
+		*/
+
 		sum += pow( distance / distanceaux , 2/(node->fuzziness-1) );
 	}
+
+	/*
+	una vez que esté listo el acumulado (sum), se divide 1 / sum, siempre y cuando la suma
+	sea mayor a cero, debido a que:
+	1) la división entre cero está indeterminada
+	2) no se aceptan pertenencias negativas, el rango va de 0 a 1, 
+	si la suma es igual o menor a cero se retorna 1, lo que representa que 
+	la pertenencia del dato j al centro i es total.
+	*/
 
 	if (sum > 0){
 		return (1 / sum);
@@ -107,6 +140,7 @@ float calcularCentro2 (int i, int j, int totalTuplas, ClusteringState *node, int
 	
 	float sum1 = 0;
 	float sum2 = 0;
+	float potencia = 0;
 
 	TupleTableSlot *slot;
 	slot = ExecProcNode(outerPlanState(node));
@@ -119,11 +153,34 @@ float calcularCentro2 (int i, int j, int totalTuplas, ClusteringState *node, int
 		slot->tts_tuple = ExecMaterializeSlot(slot);
 		slot_getallattrs(slot);
 
+		/*
+		para calcular el centro de un grupo se sigue el siguiente procedimiento
+
+		primero se realizan dos sumas por separado:
+		*en la primera la pertenencia de un dato al grupo se eleva a la m (valor del difusor),
+		y el resultado se multiplica con ese dato.
+		*el la segunda suma solamente se calcula la potencia del dato a la m
+
+		este procedimiento se realiza para cada dato y el resultado de cada operación se 
+		va acumulando en su respectiva suma.
+
+		*/
+		potencia = pow ( pertenencia[aux][i] , node->fuzziness);
+/*
 		sum1 += pow ( pertenencia[aux][i] , node->fuzziness) * DatumGetFloat4(slot->tts_values[j]);
 		sum2 += pow ( pertenencia[aux][i] , node->fuzziness);
+*/
+		sum1 += potencia * DatumGetFloat4(slot->tts_values[j]);
+		sum2 += potencia;
 
 		slot = ExecProcNode(outerPlanState(node));
 	}
+
+	/*
+	por último, se realiza una división entre las dos sumas, obteniendo como resultado 
+	el nuevo centro del grupo
+
+	*/
 
 	return (sum1/sum2);
 }
