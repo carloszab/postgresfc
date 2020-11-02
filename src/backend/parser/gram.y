@@ -10373,10 +10373,9 @@ clustering_clause:
 			| /*EMPTY*/								{ $$ = NIL; }
 		;
 		
-clustering_list:	Iconst 							{ $$ = list_make1_int($1); }
-			| clustering_list ',' Iconst			{ $$ = lappend_int($1, $3); }
+clustering_list:	Sconst 							{ $$ = list_make1($1); }
+			| clustering_list ',' Sconst			{ $$ = lappend($1, $3); }
 		;
-
 
 /*
  * This syntax for group_clause tries to follow the spec quite closely.

@@ -959,9 +959,9 @@ typedef struct PlanInvalItem
 typedef struct Clustering
 {
 	Plan		plan;
-	int		cant_grupos;
-	int		fuzziness;
-	int		error;
+	int			cant_grupos;	/* cantidad de grupos a calcular*/
+	float		fuzziness;		/* valor del difusor*/
+	float		error;			/* error o condición de parada*/
 } Clustering;
 
 #endif   /* PLANNODES_H */

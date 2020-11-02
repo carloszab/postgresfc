@@ -19,6 +19,5 @@
 extern ClusteringState *ExecInitClustering(Clustering *node, EState *estate, int eflags);
 extern TupleTableSlot *ExecClustering(ClusteringState *node);
 extern void ExecEndClustering(ClusteringState *node);
-/*extern void ExecReScanClustering(ClusteringState *node);*/
 
 #endif   /* NODECLUSTERING_H */

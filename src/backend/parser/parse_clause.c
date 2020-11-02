@@ -3296,6 +3296,8 @@ List *
 transformClusteringClause(ParseState *pstate, List *clusteringlist)
 {
 	List	   *fclist = NIL;
+	int			c;
+	float		m, e;
 
 	if (clusteringlist == NIL)
 		elog(ERROR, "error with ClusteringClause, the list is empty");
@@ -3304,9 +3306,13 @@ transformClusteringClause(ParseState *pstate, List *clusteringlist)
 		elog(ERROR, "wrong number of parameters in CLUSTERING (c,m,e)");
 	else 
 		{
-			fclist = lappend_int(fclist,list_nth_int(clusteringlist, 0));
-			fclist = lappend_int(fclist,list_nth_int(clusteringlist, 1));
-			fclist = lappend_int(fclist,list_nth_int(clusteringlist, 2));
+			c = atoi(list_nth(clusteringlist, 0));
+			m = atof(list_nth(clusteringlist, 1)) * 100;
+			e = atof(list_nth(clusteringlist, 2)) * 1000000;
+
+			fclist = lappend_int(fclist, c);
+			fclist = lappend_int(fclist, (int) m);
+			fclist = lappend_int(fclist, (int) e);
 		}
 		return fclist;
 }

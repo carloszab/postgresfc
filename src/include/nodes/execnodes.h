@@ -2054,17 +2054,16 @@ typedef struct LimitState
 
 typedef struct ClusteringState
 {
-	ScanState	ss;
-	int 		tupla_actual; 		/* un simple contador */
-	int			total_tuplas;
-	bool		calcular;			/*true si hay que hacer las operaciones o false si ya se realizaron*/
-	float 		*centros;
-	float       *pertenencia;
-	int 		cant_grupos;
-	float 		fuzziness;
-	float 		error;
-	TupleTableSlot *tupla;
-	Tuplestorestate 		*tss;
+
+	PlanState		ps;					/* su primer campo es NodeTag*/
+	int				total_tuplas;		/* el número de tuplas en total presentes en la tabla*/
+	bool			calcular;			/* true si se deben realizar las operaciones*/
+	float 			*centros;			/* matriz que almacena los centros*/
+	float       	*pertenencia;		/* matriz que almacena las pertenencias*/
+	int 			cant_grupos;		/* cantidad de grupos a calcular*/
+	float 			fuzziness;			/* valor del difusor*/
+	float 			error;				/* error o condición de parada*/
+	Tuplestorestate *tss;				/* información para almacenar tuplas temporalmente*/
 } ClusteringState;
 
 #endif   /* EXECNODES_H */

@@ -187,10 +187,6 @@ ExecInitNode(Plan *node, EState *estate, int eflags)
 			/*
 			 * scan nodes
 			 */
-		case T_Clustering:
-			result = (PlanState *) ExecInitClustering((Clustering *) node,
-												   estate, eflags);
-			break;
 
 		case T_SeqScan:
 			result = (PlanState *) ExecInitSeqScan((SeqScan *) node,
@@ -333,6 +329,11 @@ ExecInitNode(Plan *node, EState *estate, int eflags)
 												 estate, eflags);
 			break;
 
+		case T_Clustering:
+			result = (PlanState *) ExecInitClustering((Clustering *) node,
+												   estate, eflags);
+			break;
+
 		default:
 			elog(ERROR, "unrecognized node type: %d", (int) nodeTag(node));
 			result = NULL;		/* keep compiler quiet */
@@ -414,9 +415,6 @@ ExecProcNode(PlanState *node)
 			/*
 			 * scan nodes
 			 */
-		case T_ClusteringState:
-			result = ExecClustering((ClusteringState *) node);
-			break;
 
 		case T_SeqScanState:
 			result = ExecSeqScan((SeqScanState *) node);
@@ -528,6 +526,10 @@ ExecProcNode(PlanState *node)
 
 		case T_LimitState:
 			result = ExecLimit((LimitState *) node);
+			break;
+
+		case T_ClusteringState:
+			result = ExecClustering((ClusteringState *) node);
 			break;
 
 		default:
@@ -660,9 +662,6 @@ ExecEndNode(PlanState *node)
 			/*
 			 * scan nodes
 			 */
-		case T_ClusteringState:
-			ExecEndClustering((ClusteringState *) node);
-			break;
 			
 		case T_SeqScanState:
 			ExecEndSeqScan((SeqScanState *) node);
@@ -776,6 +775,10 @@ ExecEndNode(PlanState *node)
 
 		case T_LimitState:
 			ExecEndLimit((LimitState *) node);
+			break;
+
+		case T_ClusteringState:
+			ExecEndClustering((ClusteringState *) node);
 			break;
 
 		default:
