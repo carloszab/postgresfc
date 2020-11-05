@@ -3298,7 +3298,6 @@ transformClusteringClause(ParseState *pstate, List *clusteringlist)
 	List	   *fclist = NIL;
 	int			c;
 	float		m, e;
-
 	if (clusteringlist == NIL)
 		elog(ERROR, "error with ClusteringClause, the list is empty");
 
@@ -3307,12 +3306,19 @@ transformClusteringClause(ParseState *pstate, List *clusteringlist)
 	else 
 		{
 			c = atoi(list_nth(clusteringlist, 0));
-			m = atof(list_nth(clusteringlist, 1)) * 100;
-			e = atof(list_nth(clusteringlist, 2)) * 1000000;
+			m = atof(list_nth(clusteringlist, 1));
+			e = atof(list_nth(clusteringlist, 2));
+
+			if (c < 2)
+				elog(ERROR, "the number of clusters must be at least two");
+			if (m <= 1)
+				elog(ERROR, "the fuzziness parameter must be greater than one");
+			if (e <= 0)
+				elog(ERROR, "the error must be a positive number");
 
 			fclist = lappend_int(fclist, c);
-			fclist = lappend_int(fclist, (int) m);
-			fclist = lappend_int(fclist, (int) e);
+			fclist = lappend_int(fclist, (int) m * 100);
+			fclist = lappend_int(fclist, (int) e * 1000000);
 		}
 		return fclist;
 }

@@ -1285,7 +1285,7 @@ typedef struct SelectStmt
 	List	   *targetList;		/* the target list (of ResTarget) */
 	List	   *fromClause;		/* the FROM clause */
 	Node	   *whereClause;	/* WHERE qualification */
-	List	   *clusteringClause; /* lista de CLUSTERING */
+	List	   *clusteringClause; /* CLUSTERING clause*/
 	List	   *groupClause;	/* GROUP BY clauses */
 	Node	   *havingClause;	/* HAVING conditional-expression */
 	List	   *windowClause;	/* WINDOW window_name AS (...), ... */

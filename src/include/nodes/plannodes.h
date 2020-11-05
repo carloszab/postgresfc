@@ -953,7 +953,7 @@ typedef struct PlanInvalItem
 
 /*
  * ==========
- * Fuzzy clustering nodes
+ * Clustering node
  * ==========
  */
 typedef struct Clustering

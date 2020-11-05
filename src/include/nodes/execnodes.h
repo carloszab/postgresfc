@@ -2054,7 +2054,6 @@ typedef struct LimitState
 
 typedef struct ClusteringState
 {
-
 	PlanState		ps;					/* su primer campo es NodeTag*/
 	int				total_tuplas;		/* el número de tuplas en total presentes en la tabla*/
 	bool			calcular;			/* true si se deben realizar las operaciones*/
