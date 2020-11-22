@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION "public"."doClustering"(varchar, varchar, int4, int4, float8, float8)
+CREATE OR REPLACE FUNCTION "doClustering"(varchar, varchar, int4, int4, float8, float8)
   RETURNS "pg_catalog"."void" AS $BODY$
 	
 	DECLARE
@@ -10,7 +10,6 @@ CREATE OR REPLACE FUNCTION "public"."doClustering"(varchar, varchar, int4, int4,
 	fuzziness alias for $5;
 	error alias for $6;
 
-	query text DEFAULT NULL;
 	i int;
 
 	

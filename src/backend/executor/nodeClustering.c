@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
  *
  * nodeClustering.c
- *	  Support routines for fuzzy clustering.
+ *	  Support routines for Clustering
  *
  * Portions Copyright (c) 2020, PostgreSQLf UCAB Development Group
  * Portions Copyright (c) 2020, Regents of the Universidad Catolica Andres Bello
@@ -32,7 +32,7 @@
 #include "miscadmin.h" // necesario para usar work_mem
 
 
-float calcularPertenencia (int j, int dimension, float datos[dimension], int cantGrupos, ClusteringState *node, float centros[cantGrupos][dimension]){
+float calcularPertenencia (int j, int dimension, float datos[dimension], int cantGrupos, ClusteringState *node, float *centros){
 	double sum = 0;
 	double distance = 0;
 	double distanceaux = 0;
@@ -47,7 +47,7 @@ float calcularPertenencia (int j, int dimension, float datos[dimension], int can
 	*/
 
 	for (int i = 0; i < dimension; i++){
-		distance += pow ( datos[i] - centros[j][i], 2);
+		distance += pow ( datos[i] - centros[j * dimension + i], 2);
 	}
 
 	distance = sqrt(distance);
@@ -64,7 +64,7 @@ float calcularPertenencia (int j, int dimension, float datos[dimension], int can
 		*/
 
 		for (int i = 0; i < dimension; i++){
-			distanceaux += pow ( datos[i] - centros[k][i], 2);
+			distanceaux += pow ( datos[i] - node->centros[k * dimension + i], 2);
 		}
 		distanceaux = sqrt(distanceaux);
 		
@@ -97,7 +97,7 @@ float calcularPertenencia (int j, int dimension, float datos[dimension], int can
 }
 
 
-float calcularCentro (int i, int j, int totalTuplas, ClusteringState *node, int cantGrupos, float pertenencia[totalTuplas][cantGrupos]){
+float calcularCentro (int i, int j, int totalTuplas, ClusteringState *node, int cantGrupos, float *pertenencia){
 	
 	double sum1 = 0;
 	double sum2 = 0;
@@ -126,7 +126,7 @@ float calcularCentro (int i, int j, int totalTuplas, ClusteringState *node, int 
 		va acumulando en su respectiva suma.
 
 		*/
-		potencia = pow ( pertenencia[aux][i] , node->fuzziness);
+		potencia = pow ( pertenencia[aux * cantGrupos + i] , node->fuzziness);
 
 		sum1 += potencia * DatumGetFloat4(slot->tts_values[j]);
 		sum2 += potencia;
@@ -198,28 +198,35 @@ ExecClustering(ClusteringState *node)
 		 * con numeros aleatorios
 		 */
 
-		float pertenencia[totalTuplas][cantGrupos];
-		for(int i = 0; i < totalTuplas; i++){
+		node->pertenencia = palloc(sizeof *node->pertenencia * totalTuplas * cantGrupos);
+		if(node->pertenencia==NULL){
+			elog(ERROR, "palloc() failed: insufficient memory");
+		}
+
+		for (int i = 0; i < totalTuplas; i++){
 			float aux = 0;
-			for(int j = 0; j < cantGrupos; j++){
+			for (int j = 0; j < cantGrupos; j++){
 				if (j != cantGrupos-1){
-					pertenencia[i][j] = ((float)rand()/(float)(RAND_MAX))  * (1-aux);
-					aux += pertenencia[i][j];
-				}else{
-					pertenencia[i][j] = 1-aux;
+					node->pertenencia[i * cantGrupos + j] = ((float)rand()/(float)(RAND_MAX))  * (1-aux);
+					aux += node->pertenencia[i * cantGrupos + j];
+				} else {
+					node->pertenencia[i * cantGrupos + j] = 1-aux;
 				}
 			}
-		}
-		
+		}	
 
 		/** una vez se ha inicializado la matriz de pertenencias
 		 * se inicializa la matriz de centros de los clusters
 		 */
 
-		float centros[cantGrupos][dimension];
+		node->centros = palloc(sizeof *node->centros * cantGrupos * dimension);
+		if(node->centros==NULL){
+			elog(ERROR, "palloc() failed: insufficient memory");
+		}
+
 		for(int i = 0; i < cantGrupos; i++){
 			for(int j = 0; j < dimension; j++){
-				centros[i][j] = calcularCentro(i, j, totalTuplas, node, cantGrupos, pertenencia);
+				node->centros[i * dimension + j] = calcularCentro(i, j, totalTuplas, node, cantGrupos, node->pertenencia);
 			}
 		}
 
@@ -249,7 +256,7 @@ ExecClustering(ClusteringState *node)
 				}
 
 				for (int j = 0; j < cantGrupos; j++){
-					pertenencia[i][j] = calcularPertenencia(j, dimension, datos, cantGrupos, node, centros);
+					node->pertenencia[i * cantGrupos + j] = calcularPertenencia(j, dimension, datos, cantGrupos, node, node->centros);
 				}
 			}
 			slot = ExecProcNode(outerPlanState(node));
@@ -264,10 +271,10 @@ ExecClustering(ClusteringState *node)
 			for (int i = 0; i < cantGrupos; i++){
 				diffaux = 0;
 				for (int j = 0; j < dimension; j++){
-					aux = centros[i][j];
-					centros[i][j] = calcularCentro(i, j, totalTuplas, node, cantGrupos, pertenencia);
+					aux = node->centros[i * dimension + j];
+					node->centros[i * dimension + j] = calcularCentro(i, j, totalTuplas, node, cantGrupos, node->pertenencia);
 
-					diffaux += pow ( centros[i][j] - aux, 2);
+					diffaux += pow ( node->centros[i * dimension + j] - aux, 2);
 				}
 				diffaux = sqrt(diffaux);
 
@@ -286,12 +293,12 @@ ExecClustering(ClusteringState *node)
 		for(int z = 0; z < totalTuplas; z++){
 
 			for (int i = dimension; i < nvalid; i++){
-				slot->tts_values[i] = Float4GetDatum(pertenencia[z][i - dimension]);
+				slot->tts_values[i] = Float4GetDatum(node->pertenencia[z * cantGrupos + (i - dimension)]);
 				slot->tts_isnull[i] = FALSE;
 			}
 			if (z < cantGrupos){
 				for (int i = nvalid; i < columnas; i++){
-					slot->tts_values[i] = Float4GetDatum(centros[z][i - nvalid]);
+					slot->tts_values[i] = Float4GetDatum(node->centros[z * dimension + (i - nvalid)]);
 					slot->tts_isnull[i] = FALSE;
 				}
 			}
@@ -386,6 +393,12 @@ void
 ExecEndClustering(ClusteringState *node)
 {
 	
+	/*liberar memoria reservada por la matriz de pertenencias*/
+	pfree(node->pertenencia);
+
+	/*liberar memoria usada por la matriz de centros*/
+	pfree(node->centros);
+
     ExecFreeExprContext(&node->ps);
 	
     ExecEndNode(outerPlanState(node));
